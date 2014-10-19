@@ -20,9 +20,32 @@ char *StringIsBeautiful(const char *str, unsigned int len)
 {
 	unsigned int i;
 
+	/* 
+		step步数 
+		例如abc a为第0步 b为第1步 c为第2步
+		aabbcc aa为第0步 bb为第1步 cc为第2步
+	*/
 	unsigned int step;
+	
+	/* 
+		steplen 每步步长 
+		例如abc 步长都为1
+		aabbcc 步长都为2
+	*/
 	unsigned int steplen[3];
-
+	
+	/*
+		算法解析:
+		由于满足条件的子串最少需要3步，所以只考虑满足3步的情况。
+		也就是要在给定字符串中查找类似abc aabbcc aaabbbccc的子串。
+		每步步长默认为1，如果有重复字符，则当前步长加1。
+		字符递增时检查当前步数，并作出相应处理。
+		
+		从给定字符串的起始位置也就是第0个字符开始，作为可能的子串匹配目标条件。
+		如果不符合条件则从第1个字符开始，再次匹配。以此类推，直到结束
+	*/
+	
+	
 	unsigned int subStrStart;
 	unsigned int subStrStartMax=len-3;
 
@@ -32,24 +55,32 @@ char *StringIsBeautiful(const char *str, unsigned int len)
 		return STR_NO;
 	}
 
+	//轮询所有可能的子串
 	for(subStrStart=0; subStrStart<=subStrStartMax; subStrStart++)
 	{
+		//步长、步数初始化
 		steplen[0]=1;
 		steplen[1]=1;
 		steplen[2]=1;
 		step=0;
 		
+		//检测当前子串
 		for(i=subStrStart+1; i<len; i++)
 		{
+			//字符递增
 			if((str[i]-str[i-1])==1)
 			{
+				//第0步，步数递增
 				if(step==0)
 				{
 					step=1;
 				}
+				//第1步
 				else if(step==1)
 				{
-					if(steplen[0]==steplen[1])
+					//第0步步长大于等于第1步步长，则可能是符合条件的子串
+					//步数递增
+					if(steplen[0]>=steplen[1])
 					{
 						step=2;
 					}
@@ -59,9 +90,11 @@ char *StringIsBeautiful(const char *str, unsigned int len)
 						break;
 					}
 				}
+				//第2步
 				else
 				{
-					if(steplen[2]==steplen[1])
+					//第2步步长大于等于第1步步长，子串符合条件
+					if(steplen[2]>=steplen[1])
 					{
 						printf("Y0 %d ", subStrStart);
 						return STR_YES;
@@ -73,16 +106,19 @@ char *StringIsBeautiful(const char *str, unsigned int len)
 					}
 				}
 			}
+			//重复字符 步长递增
 			else if(str[i]==str[i-1])
 			{
 				steplen[step]++;
 			}
+			//字符非递增，亦非重复，结束
 			else
 			{
 				break;
 			}
 		}
 		
+		//已经到第2步，且第2步步长大于等于第1步步长，子串符合条件
 		if((step==2)&&(steplen[2]>=steplen[1]))
 		{
 			printf("Y1 %d ", subStrStart);
@@ -97,6 +133,9 @@ int main(void)
 {
 	char *str[]=
 	{	
+		"frrssttuv",
+		"frrssttttuv",
+		"saabbcccd",
 		"aaab",
 		"abccde",
 		"abb",
